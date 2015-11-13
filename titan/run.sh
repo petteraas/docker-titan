@@ -31,7 +31,7 @@ wait_for_startup() {
 }
 
 ELASTICSEARCH_STARTUP_TIMEOUT_S=60
-CASSANDRA_STARTUP_TIMEOUT_S=60
+SCYLLADB_STARTUP_TIMEOUT_S=60
 
 wait_for_startup Elasticsearch \
 	$ELASTICSEARCH_PORT_9200_TCP_ADDR \
@@ -40,10 +40,10 @@ wait_for_startup Elasticsearch \
    return 1
 }
 
-wait_for_startup Cassandra \
-	$CASSANDRA_PORT_9160_TCP_ADDR \
-	$CASSANDRA_PORT_9160_TCP_PORT \
-	$CASSANDRA_STARTUP_TIMEOUT_S || {
+wait_for_startup ScyllaDB \
+	$SCYLLADB_PORT_9160_TCP_ADDR \
+	$SCYLLADB_PORT_9160_TCP_PORT \
+	$SCYLLADB_STARTUP_TIMEOUT_S || {
 	return 1
 }
 
@@ -52,20 +52,20 @@ sed -i "s/host: localhost/host: 0.0.0.0/g" conf/gremlin-server/gremlin-server.ya
 sed -i "s/titan-berkeleyje-server.properties/titan-cassandra-es-server.properties/g" conf/gremlin-server/gremlin-server.yaml
 
 # Want to have JSON / Http access to your titan-server? then enable the following two lines
-#sed -i "s/channelizer: org.apache.tinkerpop.gremlin.server.channel.WebSocketChannelizer/channelizer: org.apache.tinkerpop.gremlin.server.channel.HttpChannelizer/g" conf/gremlin-server/gremlin-server.yaml
-#sed -i "s/serializers:/serializers:\n  - { className: org.apache.tinkerpop.gremlin.driver.ser.JsonMessageSerializerGremlinV1d0 }\n  - { className: org.apache.tinkerpop.gremlin.driver.ser.JsonMessageSerializerV1d0, config: { useMapperFromGraph: graph } }/g" conf/gremlin-server/gremlin-server.yaml
+sed -i "s/channelizer: org.apache.tinkerpop.gremlin.server.channel.WebSocketChannelizer/channelizer: org.apache.tinkerpop.gremlin.server.channel.HttpChannelizer/g" conf/gremlin-server/gremlin-server.yaml
+sed -i "s/serializers:/serializers:\n  - { className: org.apache.tinkerpop.gremlin.driver.ser.JsonMessageSerializerGremlinV1d0 }\n  - { className: org.apache.tinkerpop.gremlin.driver.ser.JsonMessageSerializerV1d0, config: { useMapperFromGraph: graph } }/g" conf/gremlin-server/gremlin-server.yaml
 
 # Following two lines will enable the Websocket access to your titan-server! Meaning, you can connect using your gremlin-driver from your client applications
 # IMPORTANT - Please comment out the following two lines in case you are enabling JSON/ HTTP access from the above section.
 # they both can't co-exist
-sed -i "s/GraphSONMessageSerializerGremlinV1d0.*/GraphSONMessageSerializerGremlinV1d0 \}/g" conf/gremlin-server/gremlin-server.yaml
-sed -i "s/GraphSONMessageSerializerV1d0.*/GraphSONMessageSerializerV1d0 \}/g" conf/gremlin-server/gremlin-server.yaml
+#sed -i "s/GraphSONMessageSerializerGremlinV1d0.*/GraphSONMessageSerializerGremlinV1d0 \}/g" conf/gremlin-server/gremlin-server.yaml
+#sed -i "s/GraphSONMessageSerializerV1d0.*/GraphSONMessageSerializerV1d0 \}/g" conf/gremlin-server/gremlin-server.yaml
 
 
 # create the backing file
 cp conf/titan-cassandra-es.properties conf/gremlin-server/titan-cassandra-es-server.properties
 sed -i "s/storage.backend=cassandrathrift/storage.backend=cassandra/g" conf/gremlin-server/titan-cassandra-es-server.properties
-sed -i "s/storage.hostname=127.0.0.1/storage.hostname=$CASSANDRA_PORT_9160_TCP_ADDR/g" conf/gremlin-server/titan-cassandra-es-server.properties
+sed -i "s/storage.hostname=127.0.0.1/storage.hostname=$SCYLLADB_PORT_9160_TCP_ADDR/g" conf/gremlin-server/titan-cassandra-es-server.properties
 sed -i "s/client-only=true/client-only=false/g" conf/gremlin-server/titan-cassandra-es-server.properties
 sed -i "s/index.search.hostname=127.0.0.1/index.search.hostname=$ELASTICSEARCH_PORT_9200_TCP_ADDR/g" conf/gremlin-server/titan-cassandra-es-server.properties
 cat <<EOF >> conf/gremlin-server/titan-cassandra-es-server.properties

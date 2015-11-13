@@ -30,7 +30,7 @@ fi
 RUN if [ $CUSTOMIZE_TINKERPOP -eq "YES" ]; \
 then \
 	cd incubator-tinkerpop; \
-	git checkout tags/3.0.0-incubating; \
+	git checkout tags/3.0.1-incubating; \
 	TINKERPOP_VERSION=$( cat pom.xml | grep "^    <version>.*</version>$" | awk -F'[><]' '{print $3}'); \
 	echo "TINKERPOP_VERSION IS: $TINKERPOP_VERSION"; \
 fi
@@ -49,7 +49,7 @@ fi
 
 #Ideally you wouldn't need to specify any changes to the TINKERPOP version, if you have done any changes like in above commented
 # code, you may wish to change the version, to be sure that your changes are picked up by titan build that follows
-ENV TINKERPOP_VERSION="3.0.0-MY-SNAPSHOT"
+ENV TINKERPOP_VERSION="3.0.1-incubating"
 RUN if [ $CUSTOMIZE_TINKERPOP -eq "YES" ]; \
 then \
 	cd incubator-tinkerpop; \

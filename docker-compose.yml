@@ -2,13 +2,13 @@ titan:
   build: titan
   links:
     - elasticsearch
-    - cassandra
+    - scylladb
   ports:
     - "8182:8182"
   restart: always
 
-cassandra:
-  image: cassandra:2.0
+scylladb:
+  image: scylladb/scylla
   volumes:
     - "/var/lib/cassandra/data:/var/lib/cassandra/data"
   restart: always
