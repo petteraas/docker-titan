@@ -9,8 +9,9 @@ titan:
 
 scylladb:
   image: scylladb/scylla
-  volumes:
-    - "/var/lib/cassandra/data:/var/lib/cassandra/data"
+## Uncomment to use hosted volume
+#  volumes:
+#    - "/var/lib/cassandra/data:/var/lib/cassandra/data"
   restart: always
 
 elasticsearch:
